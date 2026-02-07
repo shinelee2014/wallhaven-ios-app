@@ -79,9 +79,9 @@ class _HomeViewState extends State<HomeView> {
                     borderRadius: BorderRadius.circular(12),
                     child: CachedNetworkImage(
                       imageUrl: wallpaper.thumbs['large']!,
-                      placeholder: (context, url) => Container(
-                        color: Colors.grey[900],
+                      placeholder: (context, url) => AspectRatio(
                         aspectRatio: wallpaper.dimensionX / wallpaper.dimensionY,
+                        child: Container(color: Colors.grey[900]),
                       ),
                       errorWidget: (context, url, error) => const Icon(Icons.error),
                     ),
