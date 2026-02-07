@@ -21,17 +21,15 @@ jobs:
       - name: Create iOS boilerplate
         run: |
           flutter create --platforms=ios .
-          # Forcefully inject a dummy Team ID into all build configurations
-          sed -i '' 's/DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = DUMMY12345;/g' ios/Runner.xcodeproj/project.pbxproj
-          sed -i '' 's/CODE_SIGN_STYLE = .*/CODE_SIGN_STYLE = Manual;/g' ios/Runner.xcodeproj/project.pbxproj
-          sed -i '' 's/CODE_SIGN_IDENTITY = .*/CODE_SIGN_IDENTITY = "";/g' ios/Runner.xcodeproj/project.pbxproj
+          # Append our bypass settings to the existing Release configuration
+          cat ios/FlashSigning.xcconfig >> ios/Flutter/Release.xcconfig
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build iOS (No codesign)
         run: |
-          flutter build ios --release --no-codesign CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+          flutter build ios --release --no-codesign
 
       - name: Package Unsigned IPA
         run: |
