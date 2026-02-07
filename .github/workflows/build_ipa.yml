@@ -22,29 +22,18 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Import Apple Certificate
-        uses: apple-actions/import-codesign-certs@v1
-        with:
-          p12-file-base64: ${{ secrets.CERTIFICATE_P12_BASE64 }}
-          p12-password: ${{ secrets.CERTIFICATE_PASSWORD }}
-          browser-bundle-id: com.yourcompany.wallhaven # Change this
-          create-keychain: true
-
-      - name: Install Provisioning Profile
-        uses: apple-actions/download-provisioning-profiles@v1
-        with:
-          bundle-id: com.yourcompany.wallhaven
-          profile-type: 'enterprise'
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-
-      - name: Build IPA
+      - name: Build iOS (No codesign)
         run: |
-          flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+          flutter build ios --release --no-codesign
+
+      - name: Package Unsigned IPA
+        run: |
+          mkdir Payload
+          cp -r build/ios/iphoneos/Runner.app Payload/
+          zip -r wallhaven-unsigned.ipa Payload
 
       - name: Upload IPA
         uses: actions/upload-artifact@v3
         with:
-          name: wallhaven-release-ipa
-          path: build/ios/ipa/*.ipa
+          name: wallhaven-unsigned-ipa
+          path: wallhaven-unsigned.ipa
